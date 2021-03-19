@@ -10,6 +10,8 @@ import static net.runelite.client.RuneLite.RUNELITE_DIR;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 
 @Slf4j
@@ -63,6 +65,12 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
             waveSplitsString += "Personal best: " + personalBest;
 
             textfilecreator(killcount, duration);
+        }
+
+        if (event.getMessage().startsWith("You have been defeated") && currentWave!=null){
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
+            LocalDateTime now = LocalDateTime.now();
+            textfilecreator("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
         }
     }
 
