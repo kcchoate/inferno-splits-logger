@@ -68,18 +68,20 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
 
 
     private void textfilecreator(String killcount, String duration) {
-        File infernoDir = new File(RUNELITE_DIR + "\\InfernoTimerLogs\\" + client.getLocalPlayer().getName());
-        infernoDir.mkdirs();
+        File dir = new File(RUNELITE_DIR, "InfernoTimerLogs/" + client.getLocalPlayer().getName());
+        dir.mkdirs();
 
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter( RUNELITE_DIR + "\\InfernoTimerLogs\\" + client.getLocalPlayer().getName() + "\\" + killcount.substring(4) + "KC, " + duration +".txt", true);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
-            printWriter.print(waveSplitsString);
-            printWriter.close();
+        String fileName = killcount.substring(4) + "KC, " + duration + ".txt";
+
+        try (FileWriter fw = new FileWriter(new File(dir, fileName)))
+        {
+            fw.write(waveSplitsString);
         }
-        catch (IOException e) {
+        catch (IOException ex)
+        {
+            log.debug("Error writing file: {}", ex.getMessage());
         }
+
         reset();
     }
 
