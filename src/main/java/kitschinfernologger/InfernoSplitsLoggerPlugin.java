@@ -58,7 +58,7 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
             killcount = event.getMessage().replaceAll("\\D+","");
         }
         if (event.getMessage().startsWith("Duration:") && killcount!=null){
-            duration = event.getMessage().split("\\.")[0].split(">")[1].replace(":",";");
+            duration = event.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
             personalBest = event.getMessage().split("Personal best: ")[1];
 
             waveSplitsString += "Duration: " + duration + "\n";
