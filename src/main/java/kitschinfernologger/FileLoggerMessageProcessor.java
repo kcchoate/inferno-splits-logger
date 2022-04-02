@@ -16,20 +16,16 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     @Override
     protected void HandleCompletionMessage(ChatMessage message) {
         super.HandleCompletionMessage(message);
-
-        writeSplitsToFile(killcount, duration);
+        writeSplitsToFile();
     }
 
     @Override
     protected void HandleDefeatedMessage(ChatMessage message) {
         super.HandleDefeatedMessage(message);
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
-        LocalDateTime now = LocalDateTime.now();
-        writeSplitsToFile("0000Failed ",currentWave + ", "+ dtf.format(now) );
+        writeSplitsToFile();
     }
 
-    private void writeSplitsToFile(String killcount, String duration) {
+    private void writeSplitsToFile() {
         if (!config.getShouldWriteToFile()) {
             return;
         }
@@ -37,7 +33,7 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
         File dir = new File(RUNELITE_DIR, "InfernoTimerLogs/" + client.getLocalPlayer().getName());
         dir.mkdirs();
 
-        String fileName = killcount.substring(4) + "KC, " + duration + ".txt";
+        String fileName = getFileName();
 
         try (FileWriter fw = new FileWriter(new File(dir, fileName)))
         {
@@ -47,5 +43,14 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
         {
             log.debug("Error writing file: {}", ex.getMessage());
         }
+    }
+
+    private String getFileName() {
+        if (killCount == 0) {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
+            LocalDateTime now = LocalDateTime.now();
+            return  "Failed KC, Wave " + currentWave + dtf.format(now) + ".csv";
+        }
+        return killCount + "KC, " + duration + ".csv";
     }
 }

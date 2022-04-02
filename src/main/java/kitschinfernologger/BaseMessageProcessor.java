@@ -20,12 +20,13 @@ public abstract class BaseMessageProcessor {
     Client client;
 
     private final Pattern wavePattern = Pattern.compile("(?<=wave: )\\d+", Pattern.CASE_INSENSITIVE);
+    private final Pattern killCountPattern = Pattern.compile("(?<=your tzkal-zuk kill count is: )\\d+", Pattern.CASE_INSENSITIVE);
 
     private final List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
     String waveSplitsString = "";
 
     int currentWave;
-    String killcount = null;
+    int killCount;
     String duration = "";
     String personalBest = "";
 
@@ -63,7 +64,7 @@ public abstract class BaseMessageProcessor {
         personalBest = "";
         duration = "";
         currentWave= 0;
-        killcount = null;
+        killCount = 0;
     }
 
     void HandleFirstWaveMessage(ChatMessage message) {
@@ -71,8 +72,7 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleGenericWaveMessage(ChatMessage message) {
-        final String text = message.getMessage();
-        Matcher matcher = wavePattern.matcher(text);
+        Matcher matcher = wavePattern.matcher(message.getMessage());
         if (matcher.find()) {
             currentWave = Integer.parseInt(matcher.group());
         }
@@ -88,11 +88,14 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleKcMessage(ChatMessage message) {
-        killcount = message.getMessage().replaceAll("\\D+","");
+        Matcher matcher = killCountPattern.matcher(message.getMessage());
+        if (matcher.find()) {
+            killCount = Integer.parseInt(matcher.group());
+        }
     }
 
     void HandleCompletionMessage(ChatMessage message) {
-        if (killcount == null) {
+        if (killCount == 0) {
             return;
         }
         duration = message.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
@@ -121,7 +124,7 @@ public abstract class BaseMessageProcessor {
         if (text.startsWith("<col=ef1020>wave split:")) {
             return MessageType.WaveSplit;
         }
-        if (text.startsWith("your tzkKal-zuk kill count is:")) {
+        if (text.startsWith("your tzkal-zuk kill count is:")) {
             return MessageType.Kc;
         }
         if (text.startsWith("duration:")) {
