@@ -18,14 +18,27 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     @Inject
     private FileLoggerMessageProcessor fileLoggerMessageProcessor;
 
+    @Inject
+    private DiscordLoggerMessageProcessor discordLoggerMessageProcessor;
+
+    private BaseMessageProcessor[] processors;
+
     @Subscribe
     private void onChatMessage(ChatMessage event) {
-        fileLoggerMessageProcessor.handleMessage(event);
+        for (BaseMessageProcessor processor : processors) {
+            processor.handleMessage(event);
+        }
     }
 
     @Provides
     InfernoSplitsLoggerConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(InfernoSplitsLoggerConfig.class);
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        processors = new BaseMessageProcessor[] {fileLoggerMessageProcessor, discordLoggerMessageProcessor};
     }
 
     @Override
