@@ -2,7 +2,6 @@ package kitschinfernologger;
 
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.client.events.ConfigChanged;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -24,7 +23,8 @@ public abstract class BaseMessageProcessor {
 
     public final void handleMessage(ChatMessage message)
     {
-        switch (getMessageType(message)) {
+        final MessageType messageType = getMessageType(message);
+        switch (messageType) {
             case FirstWave:
                 HandleFirstWaveMessage(message);
                 HandleGenericWaveMessage(message);
