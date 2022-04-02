@@ -23,7 +23,7 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     protected void HandleDurationMessage(ChatMessage message) {
         super.HandleDurationMessage(message);
 
-        textfilecreator(killcount, duration);
+        writeSplitsToFile(killcount, duration);
     }
 
     @Override
@@ -32,10 +32,10 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
         LocalDateTime now = LocalDateTime.now();
-        textfilecreator("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
+        writeSplitsToFile("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
     }
 
-    private void textfilecreator(String killcount, String duration) {
+    private void writeSplitsToFile(String killcount, String duration) {
         File dir = new File(RUNELITE_DIR, "InfernoTimerLogs/" + client.getLocalPlayer().getName());
         dir.mkdirs();
 
