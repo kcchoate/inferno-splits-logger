@@ -50,50 +50,57 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     }
 
     private void HandleWaveMessage(ChatMessage event) {
-        if (event.getMessage().startsWith("<col=ef1020>Wave:")){
-            currentWave = event.getMessage();
-            for (String removestring : removeFromStringStrings)
-            {
-                currentWave=currentWave.replace(removestring,"");
-            }
+        if (!event.getMessage().startsWith("<col=ef1020>Wave:")) {
+            return;
+        }
+        currentWave = event.getMessage();
+        for (String removestring : removeFromStringStrings)
+        {
+            currentWave=currentWave.replace(removestring,"");
         }
     }
 
     private void HandleWaveSplitMessage(ChatMessage event) {
-        if (event.getMessage().startsWith("<col=ef1020>Wave Split:")){
-            String chatMessage = event.getMessage();
-            for (String removestring : removeFromStringStrings)
-            {
-                chatMessage = chatMessage.replace(removestring,"");
-            }
-            waveSplitsString += currentWave + ", " + chatMessage +"\n";
+        if (!event.getMessage().startsWith("<col=ef1020>Wave Split:")) {
+            return;
         }
+
+        String chatMessage = event.getMessage();
+        for (String removestring : removeFromStringStrings)
+        {
+            chatMessage = chatMessage.replace(removestring,"");
+        }
+        waveSplitsString += currentWave + ", " + chatMessage +"\n";
     }
 
     private void HandleKcMessage(ChatMessage event) {
-        if (event.getMessage().startsWith("Your TzKal-Zuk kill count is:")){
-            killcount = event.getMessage().replaceAll("\\D+","");
+        if (!event.getMessage().startsWith("Your TzKal-Zuk kill count is:")) {
+            return;
         }
+
+        killcount = event.getMessage().replaceAll("\\D+","");
     }
 
     private void HandleDurationMessage(ChatMessage event) {
-        if (event.getMessage().startsWith("Duration:") && killcount!=null){
-            duration = event.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
-            personalBest = event.getMessage().split("Personal best: ")[1];
-
-            waveSplitsString += "Duration: " + duration + "\n";
-            waveSplitsString += "Personal best: " + personalBest;
-
-            textfilecreator(killcount, duration);
+        if (!event.getMessage().startsWith("Duration:") || killcount == null) {
+            return;
         }
+        duration = event.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
+        personalBest = event.getMessage().split("Personal best: ")[1];
+
+        waveSplitsString += "Duration: " + duration + "\n";
+        waveSplitsString += "Personal best: " + personalBest;
+
+        textfilecreator(killcount, duration);
     }
 
     private void HandleDefeatedMessage(ChatMessage event) {
-        if (event.getMessage().startsWith("You have been defeated") && currentWave!=null){
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
-            LocalDateTime now = LocalDateTime.now();
-            textfilecreator("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
+        if (!event.getMessage().startsWith("You have been defeated") || currentWave == null) {
+            return;
         }
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
+        LocalDateTime now = LocalDateTime.now();
+        textfilecreator("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
     }
 
     private void textfilecreator(String killcount, String duration) {
