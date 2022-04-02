@@ -31,31 +31,36 @@ public abstract class BaseMessageProcessor {
 
     public final void handleMessage(ChatMessage message)
     {
-        final MessageType messageType = getMessageType(message);
+        try {
+            final MessageType messageType = getMessageType(message);
 
-        switch (messageType) {
-            case FirstWave:
-                HandleFirstWaveMessage(message);
-                HandleGenericWaveMessage(message);
-                break;
-            case GenericWave:
-                HandleGenericWaveMessage(message);
-                break;
-            case WaveSplit:
-                HandleWaveSplitMessage(message);
-                break;
-            case Kc:
-                HandleKcMessage(message);
-                break;
-            case Completion:
-                HandleCompletionMessage(message);
-                break;
-            case Defeated:
-                HandleDefeatedMessage(message);
-                break;
-            default:
-                HandleUnknownMessage(message);
-                break;
+            switch (messageType) {
+                case FirstWave:
+                    HandleFirstWaveMessage(message);
+                    HandleGenericWaveMessage(message);
+                    break;
+                case GenericWave:
+                    HandleGenericWaveMessage(message);
+                    break;
+                case WaveSplit:
+                    HandleWaveSplitMessage(message);
+                    break;
+                case Kc:
+                    HandleKcMessage(message);
+                    break;
+                case Completion:
+                    HandleCompletionMessage(message);
+                    break;
+                case Defeated:
+                    HandleDefeatedMessage(message);
+                    break;
+                default:
+                    HandleUnknownMessage(message);
+                    break;
+            }
+        }
+        catch (Exception ex) {
+            log.error("Error processing message: {}", ex);
         }
     }
 
