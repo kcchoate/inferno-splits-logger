@@ -15,10 +15,6 @@ import static net.runelite.client.RuneLite.RUNELITE_DIR;
 
 @Slf4j
 public class FileLoggerMessageProcessor extends BaseMessageProcessor {
-
-    @Inject
-    private Client client;
-
     @Override
     protected void HandleCompletionMessage(ChatMessage message) {
         super.HandleCompletionMessage(message);

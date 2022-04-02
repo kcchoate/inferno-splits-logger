@@ -1,5 +1,6 @@
 package kitschinfernologger;
 
+import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.events.ConfigChanged;
 
@@ -10,6 +11,9 @@ import java.util.List;
 public abstract class BaseMessageProcessor {
     @Inject
     InfernoSplitsLoggerConfig config;
+
+    @Inject
+    Client client;
 
     private final List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
     String waveSplitsString = "";
