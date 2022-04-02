@@ -17,17 +17,14 @@ public abstract class BaseMessageProcessor {
     @Inject
     Client client;
 
+    @Inject
+    InfernoState state;
+
     private final Pattern wavePattern = Pattern.compile("(?<=wave: )\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern killCountPattern = Pattern.compile("(?<=your tzkal-zuk kill count is: )\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern waveSplitPattern = Pattern.compile("(?<=wave split: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern durationPattern = Pattern.compile("(?<=duration: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern pbPattern = Pattern.compile("(?<=personal best: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
-
-    Map<Integer, String> waveSplits = new HashMap<>();
-    int currentWave;
-    int killCount;
-    String duration = "";
-    String personalBest = "";
 
     public final void handleMessage(ChatMessage message)
     {
@@ -65,11 +62,7 @@ public abstract class BaseMessageProcessor {
     }
 
     public void reset() {
-        waveSplits.clear();
-        personalBest = "";
-        duration = "";
-        currentWave= 0;
-        killCount = 0;
+        state.reset();
     }
 
     void HandleFirstWaveMessage(ChatMessage message) {
@@ -79,21 +72,21 @@ public abstract class BaseMessageProcessor {
     void HandleGenericWaveMessage(ChatMessage message) {
         Matcher matcher = wavePattern.matcher(message.getMessage());
         if (matcher.find()) {
-            currentWave = Integer.parseInt(matcher.group());
+            state.setCurrentWave(Integer.parseInt(matcher.group()));
         }
     }
 
     void HandleWaveSplitMessage(ChatMessage message) {
         Matcher matcher = waveSplitPattern.matcher(message.getMessage());
         if (matcher.find()) {
-            waveSplits.put(currentWave, matcher.group());
+            state.addSplit(matcher.group());
         }
     }
 
     void HandleKcMessage(ChatMessage message) {
         Matcher matcher = killCountPattern.matcher(message.getMessage());
         if (matcher.find()) {
-            killCount = Integer.parseInt(matcher.group());
+            state.setKillCount(Integer.parseInt(matcher.group()));
         }
     }
 
@@ -104,14 +97,14 @@ public abstract class BaseMessageProcessor {
             return;
         }
 
-        duration = matcher.group();
+        state.setDuration(matcher.group());
         if (text.toLowerCase(Locale.ROOT).contains("new personal best")) {
-            personalBest = duration;
+            state.setPersonalBest(state.getDuration());
         }
         else {
             Matcher pbMatcher = pbPattern.matcher(text);
             if (pbMatcher.find()) {
-                personalBest = pbMatcher.group();
+                state.setPersonalBest(pbMatcher.group());
             }
         }
     }
@@ -122,25 +115,6 @@ public abstract class BaseMessageProcessor {
 
     void HandleUnknownMessage(ChatMessage message) {
 
-    }
-
-    String getSplitsCsv() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Wave,Split");
-        sb.append('\n');
-
-        for (Map.Entry<Integer, String> split : waveSplits.entrySet()) {
-            sb.append(split.getKey());
-            sb.append(',');
-            sb.append(split.getValue());
-            sb.append('\n');
-        }
-
-        sb.append("end,");
-        sb.append(duration);
-        sb.append('\n');
-
-        return sb.toString();
     }
 
     private MessageType getMessageType(ChatMessage message) {

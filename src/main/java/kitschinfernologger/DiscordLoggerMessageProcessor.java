@@ -30,7 +30,7 @@ public class DiscordLoggerMessageProcessor extends BaseMessageProcessor {
     }
 
     private String getCompletionString() {
-        return client.getLocalPlayer().getName() + " splits!\n" + getSplitsCsv();
+        return client.getLocalPlayer().getName() + " splits!\n" + state.getSplitsCsv();
     }
 
     private void sendMessage(String message)

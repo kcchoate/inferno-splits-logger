@@ -36,7 +36,7 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
         String fileName = getFileName();
         try (FileWriter fw = new FileWriter(new File(dir, fileName)))
         {
-            fw.write(getSplitsCsv());
+            fw.write(state.getSplitsCsv());
         }
         catch (IOException ex)
         {
@@ -45,11 +45,11 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     }
 
     private String getFileName() {
-        if (killCount == 0) {
+        if (state.getKillCount() == 0) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
             LocalDateTime now = LocalDateTime.now();
-            return  "Failed KC, Wave " + currentWave + dtf.format(now) + ".csv";
+            return  "Failed KC, Wave " + state.getCurrentWave() + dtf.format(now) + ".csv";
         }
-        return killCount + "KC, " + duration + ".csv";
+        return state.getKillCount() + "KC, " + state.getDuration() + ".csv";
     }
 }
