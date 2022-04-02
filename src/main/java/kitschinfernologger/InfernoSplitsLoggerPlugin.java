@@ -43,7 +43,9 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
 
     @Override
     protected void shutDown() throws Exception {
-        fileLoggerMessageProcessor.reset();
+        for (BaseMessageProcessor processor : processors) {
+            processor.reset();
+        }
     }
 }
 
