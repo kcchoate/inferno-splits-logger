@@ -24,12 +24,11 @@ public class DiscordLoggerMessageProcessor extends BaseMessageProcessor {
     private OkHttpClient okHttpClient;
 
     @Override
-    void HandleCompletionMessage(ChatMessage message) {
-        super.HandleCompletionMessage(message);
-        sendMessage(getCompletionString());
+    public void onCompletionMessage(ChatMessage message, InfernoState state) {
+        sendMessage(getCompletionString(state));
     }
 
-    private String getCompletionString() {
+    private String getCompletionString(InfernoState state) {
         return client.getLocalPlayer().getName() + " splits!\n" + state.getSplitsCsv();
     }
 
