@@ -20,6 +20,8 @@ public abstract class BaseMessageProcessor {
     private final Pattern wavePattern = Pattern.compile("(?<=wave: )\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern killCountPattern = Pattern.compile("(?<=your tzkal-zuk kill count is: )\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern waveSplitPattern = Pattern.compile("(?<=wave split: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
+    private final Pattern durationPattern = Pattern.compile("(?<=duration: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
+    private final Pattern pbPattern = Pattern.compile("(?<=personal best: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
 
     Map<Integer, String> waveSplits = new HashMap<>();
     int currentWave;
@@ -90,11 +92,22 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleCompletionMessage(ChatMessage message) {
-        if (killCount == 0) {
+        final String text = message.getMessage();
+        Matcher matcher = durationPattern.matcher(text);
+        if (!matcher.find()) {
             return;
         }
-        duration = message.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
-        personalBest = message.getMessage().split("Personal best: ")[1];
+
+        duration = matcher.group();
+        if (text.toLowerCase(Locale.ROOT).contains("new personal best")) {
+            personalBest = duration;
+        }
+        else {
+            Matcher pbMatcher = pbPattern.matcher(text);
+            if (pbMatcher.find()) {
+                personalBest = pbMatcher.group();
+            }
+        }
     }
 
     void HandleDefeatedMessage(ChatMessage message) {
