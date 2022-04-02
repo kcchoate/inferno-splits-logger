@@ -54,6 +54,14 @@ public abstract class BaseMessageProcessor {
         }
     }
 
+    public void reset() {
+        waveSplitsString = "";
+        personalBest = "";
+        duration = "";
+        currentWave= null;
+        killcount = null;
+    }
+
     void HandleFirstWaveMessage(ChatMessage message) {
         reset();
     }
@@ -126,13 +134,5 @@ public abstract class BaseMessageProcessor {
             return MessageType.Defeated;
         }
         return MessageType.Unknown;
-    }
-
-    public void reset() {
-        waveSplitsString = "";
-        personalBest = "";
-        duration = "";
-        currentWave= null;
-        killcount = null;
     }
 }
