@@ -10,8 +10,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 @PluginDescriptor(
         name = "Inferno Splits Logger",
-        description = "Saves inferno splits timers to a text file in .runelite/InfernoTimersLogs",
-        tags = {"Inferno", "Timers","kitsch"}
+        description = "Saves inferno splits timers to a text file in .runelite/InfernoTimersLogs and/or uploads them to a Discord Webhook",
+        tags = {"Inferno", "Timers", "kitsch", "ken", "Discord", "Webhook"}
 )
 public class InfernoSplitsLoggerPlugin extends Plugin{
 
