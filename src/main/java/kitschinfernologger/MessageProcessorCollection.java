@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-public abstract class MessageProcessorCollection {
+public final class MessageProcessorCollection {
     @Inject InfernoState state;
 
     @Inject DiscordLoggerMessageProcessor discordLogger;
@@ -21,33 +21,33 @@ public abstract class MessageProcessorCollection {
     private final Pattern durationPattern = Pattern.compile("(?<=duration: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern pbPattern = Pattern.compile("(?<=personal best: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
 
-    public final void handleMessage(ChatMessage message)
+    public void handleMessage(ChatMessage message)
     {
         try {
             final MessageType messageType = getMessageType(message);
 
             switch (messageType) {
                 case FirstWave:
-                    HandleFirstWaveMessage(message);
-                    HandleGenericWaveMessage(message);
+                    handleFirstWaveMessage(message);
+                    handleGenericWaveMessage(message);
                     break;
                 case GenericWave:
-                    HandleGenericWaveMessage(message);
+                    handleGenericWaveMessage(message);
                     break;
                 case WaveSplit:
-                    HandleWaveSplitMessage(message);
+                    handleWaveSplitMessage(message);
                     break;
                 case Kc:
-                    HandleKcMessage(message);
+                    handleKcMessage(message);
                     break;
                 case Completion:
-                    HandleCompletionMessage(message);
+                    handleCompletionMessage(message);
                     break;
                 case Defeated:
-                    HandleDefeatedMessage(message);
+                    handleDefeatedMessage(message);
                     break;
                 default:
-                    HandleUnknownMessage(message);
+                    handleUnknownMessage(message);
                     break;
             }
         }
@@ -60,13 +60,13 @@ public abstract class MessageProcessorCollection {
         state.reset();
     }
 
-    void HandleFirstWaveMessage(ChatMessage message) {
+    private void handleFirstWaveMessage(ChatMessage message) {
         reset();
         discordLogger.HandleFirstWaveMessage(message, state);
         fileLogger.HandleFirstWaveMessage(message, state);
     }
 
-    void HandleGenericWaveMessage(ChatMessage message) {
+    private void handleGenericWaveMessage(ChatMessage message) {
         Matcher matcher = wavePattern.matcher(message.getMessage());
         if (matcher.find()) {
             state.setCurrentWave(Integer.parseInt(matcher.group()));
@@ -75,7 +75,7 @@ public abstract class MessageProcessorCollection {
         }
     }
 
-    void HandleWaveSplitMessage(ChatMessage message) {
+    private void handleWaveSplitMessage(ChatMessage message) {
         Matcher matcher = waveSplitPattern.matcher(message.getMessage());
         if (matcher.find()) {
             state.addSplit(matcher.group());
@@ -84,7 +84,7 @@ public abstract class MessageProcessorCollection {
         }
     }
 
-    void HandleKcMessage(ChatMessage message) {
+    private void handleKcMessage(ChatMessage message) {
         Matcher matcher = killCountPattern.matcher(message.getMessage());
         if (matcher.find()) {
             state.setKillCount(Integer.parseInt(matcher.group()));
@@ -93,7 +93,7 @@ public abstract class MessageProcessorCollection {
         }
     }
 
-    void HandleCompletionMessage(ChatMessage message) {
+    private void handleCompletionMessage(ChatMessage message) {
         final String text = message.getMessage();
         Matcher matcher = durationPattern.matcher(text);
         if (!matcher.find()) {
@@ -115,12 +115,12 @@ public abstract class MessageProcessorCollection {
         fileLogger.onCompletionMessage(message, state);
     }
 
-    void HandleDefeatedMessage(ChatMessage message) {
+    private void handleDefeatedMessage(ChatMessage message) {
         discordLogger.onDefeatedMessage(message, state);
         fileLogger.onDefeatedMessage(message, state);
     }
 
-    void HandleUnknownMessage(ChatMessage message) {
+    private void handleUnknownMessage(ChatMessage message) {
         discordLogger.HandleUnknownMessage(message, state);
         fileLogger.HandleUnknownMessage(message, state);
     }
