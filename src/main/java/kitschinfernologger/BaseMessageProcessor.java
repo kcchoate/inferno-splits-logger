@@ -21,10 +21,6 @@ public abstract class BaseMessageProcessor {
     String killcount = null;
     String duration = "";
     String personalBest = "";
-    String discordWebhookUrl = "";
-    boolean shouldUploadToDiscord = false;
-    boolean shouldWriteToFile = true;
-
 
     public final void handleMessage(ChatMessage message)
     {
@@ -105,12 +101,6 @@ public abstract class BaseMessageProcessor {
 
     void HandleUnknownMessage(ChatMessage message) {
 
-    }
-
-    void OnConfigChange(ConfigChanged configChanged) {
-        discordWebhookUrl = config.getDiscordWebhookUrl();
-        shouldUploadToDiscord = config.getShouldUploadToDiscord();
-        shouldWriteToFile = config.getShouldWriteToFile();
     }
 
     private MessageType getMessageType(ChatMessage message) {

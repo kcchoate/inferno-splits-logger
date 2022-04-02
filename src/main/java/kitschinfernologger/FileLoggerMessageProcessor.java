@@ -32,7 +32,7 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     }
 
     private void writeSplitsToFile(String killcount, String duration) {
-        if (!shouldWriteToFile) {
+        if (!config.getShouldWriteToFile()) {
             return;
         }
 

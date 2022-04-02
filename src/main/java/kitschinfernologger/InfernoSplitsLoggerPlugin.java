@@ -5,7 +5,6 @@ import com.google.inject.Provides;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
@@ -20,23 +19,13 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     private FileLoggerMessageProcessor fileLoggerMessageProcessor;
 
     @Subscribe
-    private void onChatMessage(ChatMessage event){
+    private void onChatMessage(ChatMessage event) {
         fileLoggerMessageProcessor.handleMessage(event);
     }
 
     @Provides
-    InfernoSplitsLoggerConfig provideConfig(ConfigManager configManager)
-    {
+    InfernoSplitsLoggerConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(InfernoSplitsLoggerConfig.class);
-    }
-
-    @Subscribe
-    public void onConfigChanged(ConfigChanged configChanged)
-    {
-        if (configChanged.getGroup().equalsIgnoreCase(InfernoSplitsLoggerConfig.GROUP))
-        {
-            fileLoggerMessageProcessor.OnConfigChange(configChanged);
-        }
     }
 
     @Override
