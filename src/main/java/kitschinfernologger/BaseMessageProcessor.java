@@ -1,12 +1,17 @@
 package kitschinfernologger;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+@Slf4j
 public abstract class BaseMessageProcessor {
     @Inject
     InfernoSplitsLoggerConfig config;
@@ -14,9 +19,12 @@ public abstract class BaseMessageProcessor {
     @Inject
     Client client;
 
+    private final Pattern wavePattern = Pattern.compile("(?<=wave: )\\d+", Pattern.CASE_INSENSITIVE);
+
     private final List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
     String waveSplitsString = "";
-    String currentWave = null;
+
+    int currentWave;
     String killcount = null;
     String duration = "";
     String personalBest = "";
@@ -54,7 +62,7 @@ public abstract class BaseMessageProcessor {
         waveSplitsString = "";
         personalBest = "";
         duration = "";
-        currentWave= null;
+        currentWave= 0;
         killcount = null;
     }
 
@@ -63,12 +71,11 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleGenericWaveMessage(ChatMessage message) {
-        currentWave = message.getMessage();
-        for (String removestring : removeFromStringStrings)
-        {
-            currentWave=currentWave.replace(removestring,"");
+        final String text = message.getMessage();
+        Matcher matcher = wavePattern.matcher(text);
+        if (matcher.find()) {
+            currentWave = Integer.parseInt(matcher.group());
         }
-
     }
 
     void HandleWaveSplitMessage(ChatMessage message) {
@@ -104,23 +111,23 @@ public abstract class BaseMessageProcessor {
     }
 
     private MessageType getMessageType(ChatMessage message) {
-        String text = message.getMessage();
-        if (text.startsWith("<col=ef1020>Wave: 1</col>")) {
+        String text = message.getMessage().toLowerCase(Locale.ROOT);
+        if (text.startsWith("<col=ef1020>wave: 1</col>")) {
             return MessageType.FirstWave;
         }
-        if (text.startsWith("<col=ef1020>Wave:")) {
+        if (text.startsWith("<col=ef1020>wave:")) {
             return MessageType.GenericWave;
         }
-        if (text.startsWith("<col=ef1020>Wave Split:")) {
+        if (text.startsWith("<col=ef1020>wave split:")) {
             return MessageType.WaveSplit;
         }
-        if (text.startsWith("Your TzKal-Zuk kill count is:")) {
+        if (text.startsWith("your tzkKal-zuk kill count is:")) {
             return MessageType.Kc;
         }
-        if (text.startsWith("Duration:")) {
+        if (text.startsWith("duration:")) {
             return MessageType.Completion;
         }
-        if (text.startsWith("You have been defeated")) {
+        if (text.startsWith("you have been defeated")) {
             return MessageType.Defeated;
         }
         return MessageType.Unknown;

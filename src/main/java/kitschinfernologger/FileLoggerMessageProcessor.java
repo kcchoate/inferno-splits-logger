@@ -1,8 +1,6 @@
 package kitschinfernologger;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 
 import java.io.File;
@@ -28,7 +26,7 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
         LocalDateTime now = LocalDateTime.now();
-        writeSplitsToFile("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
+        writeSplitsToFile("0000Failed ",currentWave + ", "+ dtf.format(now) );
     }
 
     private void writeSplitsToFile(String killcount, String duration) {
