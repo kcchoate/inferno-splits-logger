@@ -112,8 +112,12 @@ public abstract class BaseMessageProcessor {
         for (Map.Entry<Integer, String> split : waveSplits.entrySet()) {
             sb.append('\n');
             sb.append(split.getKey());
+            sb.append(',');
             sb.append(split.getValue());
         }
+
+        sb.append("end,");
+        sb.append(duration);
 
         return sb.toString();
     }
