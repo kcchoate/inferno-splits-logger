@@ -1,110 +1,51 @@
 package kitschinfernologger;
+
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
+import com.google.inject.Provides;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import static net.runelite.client.RuneLite.RUNELITE_DIR;
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 
-
-@Slf4j
 @PluginDescriptor(
         name = "Inferno Splits Logger",
-        description = "Saves inferno splits timers to a text file in .runelite/InfernoTimersLogs",
-        tags = {"Inferno", "Timers","kitsch"}
+        description = "Saves inferno splits timers to a text file in .runelite/InfernoTimersLogs and/or uploads them to a Discord Webhook",
+        tags = {"Inferno", "Timers", "kitsch", "ken", "Discord", "Webhook"}
 )
 public class InfernoSplitsLoggerPlugin extends Plugin{
 
     @Inject
-    private Client client;
+    private FileLoggerMessageProcessor fileLoggerMessageProcessor;
 
-    List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
-    String waveSplitsString = "";
-    String currentWave = null;
-    String killcount = null;
-    String duration = "";
-    String personalBest = "";
+    @Inject
+    private DiscordLoggerMessageProcessor discordLoggerMessageProcessor;
+
+    private BaseMessageProcessor[] processors;
 
     @Subscribe
-    private void onChatMessage(ChatMessage event){
-        if (event.getMessage().startsWith("<col=ef1020>Wave: 1</col>")) {
-            reset();
-        }
-        if (event.getMessage().startsWith("<col=ef1020>Wave:")){
-            currentWave = event.getMessage();
-            for (String removestring : removeFromStringStrings)
-            {
-                currentWave=currentWave.replace(removestring,"");
-            }
-        }
-
-        if (event.getMessage().startsWith("<col=ef1020>Wave Split:")){
-            String chatMessage = event.getMessage();
-            for (String removestring : removeFromStringStrings)
-            {
-                chatMessage = chatMessage.replace(removestring,"");
-            }
-            waveSplitsString += currentWave + ", " + chatMessage +"\n";
-        }
-
-        if (event.getMessage().startsWith("Your TzKal-Zuk kill count is:")){
-            killcount = event.getMessage().replaceAll("\\D+","");
-        }
-        if (event.getMessage().startsWith("Duration:") && killcount!=null){
-            duration = event.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
-            personalBest = event.getMessage().split("Personal best: ")[1];
-
-            waveSplitsString += "Duration: " + duration + "\n";
-            waveSplitsString += "Personal best: " + personalBest;
-
-            textfilecreator(killcount, duration);
-        }
-
-        if (event.getMessage().startsWith("You have been defeated") && currentWave!=null){
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH;mm");
-            LocalDateTime now = LocalDateTime.now();
-            textfilecreator("0000Failed ",currentWave.replace(":","")+ ", "+ dtf.format(now) );
+    private void onChatMessage(ChatMessage event) {
+        for (BaseMessageProcessor processor : processors) {
+            processor.handleMessage(event);
         }
     }
 
-
-    private void textfilecreator(String killcount, String duration) {
-        File dir = new File(RUNELITE_DIR, "InfernoTimerLogs/" + client.getLocalPlayer().getName());
-        dir.mkdirs();
-
-        String fileName = killcount.substring(4) + "KC, " + duration + ".txt";
-
-        try (FileWriter fw = new FileWriter(new File(dir, fileName)))
-        {
-            fw.write(waveSplitsString);
-        }
-        catch (IOException ex)
-        {
-            log.debug("Error writing file: {}", ex.getMessage());
-        }
-
-        reset();
+    @Provides
+    InfernoSplitsLoggerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(InfernoSplitsLoggerConfig.class);
     }
 
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        processors = new BaseMessageProcessor[] {fileLoggerMessageProcessor, discordLoggerMessageProcessor};
+    }
 
     @Override
     protected void shutDown() throws Exception {
-        reset();
-    }
-
-    private void reset() {
-        waveSplitsString = "";
-        personalBest = "";
-        duration = "";
-        currentWave= null;
-        killcount = null;
+        for (BaseMessageProcessor processor : processors) {
+            processor.reset();
+        }
     }
 }
 
