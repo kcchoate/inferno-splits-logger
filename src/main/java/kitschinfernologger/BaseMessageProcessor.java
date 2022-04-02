@@ -32,6 +32,7 @@ public abstract class BaseMessageProcessor {
     public final void handleMessage(ChatMessage message)
     {
         final MessageType messageType = getMessageType(message);
+
         switch (messageType) {
             case FirstWave:
                 HandleFirstWaveMessage(message);
@@ -121,16 +122,18 @@ public abstract class BaseMessageProcessor {
     String getSplitsCsv() {
         StringBuilder sb = new StringBuilder();
         sb.append("Wave,Split");
+        sb.append('\n');
 
         for (Map.Entry<Integer, String> split : waveSplits.entrySet()) {
-            sb.append('\n');
             sb.append(split.getKey());
             sb.append(',');
             sb.append(split.getValue());
+            sb.append('\n');
         }
 
         sb.append("end,");
         sb.append(duration);
+        sb.append('\n');
 
         return sb.toString();
     }
