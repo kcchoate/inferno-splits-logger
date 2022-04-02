@@ -52,23 +52,23 @@ public final class MessageProcessorCollection {
     }
 
     private void handleFirstWaveMessage(ChatMessage message) {
-        discordLogger.HandleFirstWaveMessage(message, state);
-        fileLogger.HandleFirstWaveMessage(message, state);
+        discordLogger.onFirstWaveMessage(message, state);
+        fileLogger.onFirstWaveMessage(message, state);
     }
 
     private void handleGenericWaveMessage(ChatMessage message) {
-        discordLogger.HandleGenericWaveMessage(message, state);
-        fileLogger.HandleGenericWaveMessage(message, state);
+        discordLogger.onGenericWaveMessage(message, state);
+        fileLogger.onGenericWaveMessage(message, state);
     }
 
     private void handleWaveSplitMessage(ChatMessage message) {
-        discordLogger.HandleWaveSplitMessage(message, state);
-        fileLogger.HandleWaveSplitMessage(message, state);
+        discordLogger.onWaveSplitMessage(message, state);
+        fileLogger.onWaveSplitMessage(message, state);
     }
 
     private void handleKcMessage(ChatMessage message) {
-        discordLogger.HandleKcMessage(message, state);
-        fileLogger.HandleKcMessage(message, state);
+        discordLogger.onKcMessage(message, state);
+        fileLogger.onKcMessage(message, state);
     }
 
     private void handleCompletionMessage(ChatMessage message) {
@@ -82,7 +82,7 @@ public final class MessageProcessorCollection {
     }
 
     private void handleUnknownMessage(ChatMessage message) {
-        discordLogger.HandleUnknownMessage(message, state);
-        fileLogger.HandleUnknownMessage(message, state);
+        discordLogger.onUnknownMessage(message, state);
+        fileLogger.onUnknownMessage(message, state);
     }
 }

@@ -138,7 +138,6 @@ public class InfernoState {
         }
     }
 
-
     public void reset() {
         waveSplits.clear();
         setPersonalBest("");
