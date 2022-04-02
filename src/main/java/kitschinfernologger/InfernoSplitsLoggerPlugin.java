@@ -15,19 +15,11 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class InfernoSplitsLoggerPlugin extends Plugin{
 
-    @Inject
-    private FileLoggerMessageProcessor fileLoggerMessageProcessor;
-
-    @Inject
-    private DiscordLoggerMessageProcessor discordLoggerMessageProcessor;
-
-    private BaseMessageProcessor[] processors;
+    @Inject private MessageProcessorCollection processorCollection;
 
     @Subscribe
     private void onChatMessage(ChatMessage event) {
-        for (BaseMessageProcessor processor : processors) {
-            processor.handleMessage(event);
-        }
+        processorCollection.handleMessage(event);
     }
 
     @Provides
@@ -36,16 +28,8 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     }
 
     @Override
-    protected void startUp() throws Exception {
-        super.startUp();
-        processors = new BaseMessageProcessor[] {fileLoggerMessageProcessor, discordLoggerMessageProcessor};
-    }
-
-    @Override
     protected void shutDown() throws Exception {
-        for (BaseMessageProcessor processor : processors) {
-            processor.reset();
-        }
+        processorCollection.reset();
     }
 }
 
