@@ -36,6 +36,10 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     }
 
     private void writeSplitsToFile(String killcount, String duration) {
+        if (!shouldWriteToFile) {
+            return;
+        }
+
         File dir = new File(RUNELITE_DIR, "InfernoTimerLogs/" + client.getLocalPlayer().getName());
         dir.mkdirs();
 

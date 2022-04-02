@@ -1,18 +1,26 @@
 package kitschinfernologger;
 
 import net.runelite.api.events.ChatMessage;
+import net.runelite.client.events.ConfigChanged;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class BaseMessageProcessor {
+    @Inject
+    InfernoSplitsLoggerConfig config;
 
     private final List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
-    protected String waveSplitsString = "";
-    protected String currentWave = null;
-    protected String killcount = null;
-    protected String duration = "";
-    protected String personalBest = "";
+    String waveSplitsString = "";
+    String currentWave = null;
+    String killcount = null;
+    String duration = "";
+    String personalBest = "";
+    String discordWebhookUrl = "";
+    boolean shouldUploadToDiscord = false;
+    boolean shouldWriteToFile = true;
+
 
     public final void handleMessage(ChatMessage message)
     {
@@ -42,11 +50,11 @@ public abstract class BaseMessageProcessor {
         }
     }
 
-    protected void HandleFirstWaveMessage(ChatMessage message) {
+    void HandleFirstWaveMessage(ChatMessage message) {
         reset();
     }
 
-    protected void HandleGenericWaveMessage(ChatMessage message) {
+    void HandleGenericWaveMessage(ChatMessage message) {
         currentWave = message.getMessage();
         for (String removestring : removeFromStringStrings)
         {
@@ -55,7 +63,7 @@ public abstract class BaseMessageProcessor {
 
     }
 
-    protected void HandleWaveSplitMessage(ChatMessage message) {
+    void HandleWaveSplitMessage(ChatMessage message) {
         String chatMessage = message.getMessage();
         for (String removestring : removeFromStringStrings)
         {
@@ -64,11 +72,11 @@ public abstract class BaseMessageProcessor {
         waveSplitsString += currentWave + ", " + chatMessage +"\n";
     }
 
-    protected void HandleKcMessage(ChatMessage message) {
+    void HandleKcMessage(ChatMessage message) {
         killcount = message.getMessage().replaceAll("\\D+","");
     }
 
-    protected void HandleDurationMessage(ChatMessage message) {
+    void HandleDurationMessage(ChatMessage message) {
         if (killcount == null) {
             return;
         }
@@ -79,12 +87,18 @@ public abstract class BaseMessageProcessor {
         waveSplitsString += "Personal best: " + personalBest;
     }
 
-    protected void HandleDefeatedMessage(ChatMessage message) {
+    void HandleDefeatedMessage(ChatMessage message) {
 
     }
 
-    protected void HandleUnknownMessage(ChatMessage message) {
+    void HandleUnknownMessage(ChatMessage message) {
 
+    }
+
+    void OnConfigChange(ConfigChanged configChanged) {
+        discordWebhookUrl = config.getDiscordWebhookUrl();
+        shouldUploadToDiscord = config.getShouldUploadToDiscord();
+        shouldWriteToFile = config.getShouldWriteToFile();
     }
 
     private MessageType getMessageType(ChatMessage message) {
@@ -110,7 +124,7 @@ public abstract class BaseMessageProcessor {
         return MessageType.Unknown;
     }
 
-    private void reset() {
+    public void reset() {
         waveSplitsString = "";
         personalBest = "";
         duration = "";

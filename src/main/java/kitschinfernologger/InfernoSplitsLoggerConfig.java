@@ -9,6 +9,16 @@ public interface InfernoSplitsLoggerConfig extends Config
     String GROUP = "infernosplitslogger";
 
     @ConfigItem(
+            keyName = "shouldWriteToFile",
+            name = "Write to File?",
+            description = "Enable to have your splits written to a log file"
+    )
+    default boolean getShouldWriteToFile()
+    {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "shouldUploadToDiscord",
             name = "Upload to Discord?",
             description = "Enable to upload your splits to a discord channel using webhooks"
@@ -24,5 +34,4 @@ public interface InfernoSplitsLoggerConfig extends Config
             description = "The Discord Webhook URL to send messages to"
     )
     String getDiscordWebhookUrl();
-
 }
