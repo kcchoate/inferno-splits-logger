@@ -5,7 +5,7 @@ public enum MessageType {
     GenericWave,
     WaveSplit,
     Kc,
-    Duration,
+    Completion,
     Defeated,
     Unknown
 }

@@ -38,8 +38,8 @@ public abstract class BaseMessageProcessor {
             case Kc:
                 HandleKcMessage(message);
                 break;
-            case Duration:
-                HandleDurationMessage(message);
+            case Completion:
+                HandleCompletionMessage(message);
                 break;
             case Defeated:
                 HandleDefeatedMessage(message);
@@ -76,7 +76,7 @@ public abstract class BaseMessageProcessor {
         killcount = message.getMessage().replaceAll("\\D+","");
     }
 
-    void HandleDurationMessage(ChatMessage message) {
+    void HandleCompletionMessage(ChatMessage message) {
         if (killcount == null) {
             return;
         }
@@ -116,7 +116,7 @@ public abstract class BaseMessageProcessor {
             return MessageType.Kc;
         }
         if (text.startsWith("Duration:")) {
-            return MessageType.Duration;
+            return MessageType.Completion;
         }
         if (text.startsWith("You have been defeated")) {
             return MessageType.Defeated;

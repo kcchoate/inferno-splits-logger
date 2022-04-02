@@ -20,8 +20,8 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
     private Client client;
 
     @Override
-    protected void HandleDurationMessage(ChatMessage message) {
-        super.HandleDurationMessage(message);
+    protected void HandleCompletionMessage(ChatMessage message) {
+        super.HandleCompletionMessage(message);
 
         writeSplitsToFile(killcount, duration);
     }
