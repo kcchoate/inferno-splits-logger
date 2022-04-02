@@ -19,9 +19,6 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     @Inject
     private FileLoggerMessageProcessor fileLoggerMessageProcessor;
 
-    @Inject
-    private InfernoSplitsLoggerConfig config;
-
     @Subscribe
     private void onChatMessage(ChatMessage event){
         fileLoggerMessageProcessor.handleMessage(event);
