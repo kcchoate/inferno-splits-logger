@@ -76,10 +76,9 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleWaveSplitMessage(ChatMessage message) {
-        final String text = message.getMessage();
-        Matcher matcher = waveSplitPattern.matcher(text);
+        Matcher matcher = waveSplitPattern.matcher(message.getMessage());
         if (matcher.find()) {
-            waveSplits.put(currentWave, text);
+            waveSplits.put(currentWave, matcher.group());
         }
     }
 
