@@ -1,9 +1,13 @@
 package kitschinfernologger;
 import javax.inject.Inject;
+
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import static net.runelite.client.RuneLite.RUNELITE_DIR;
@@ -31,7 +35,11 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
     String killcount = null;
     String duration = "";
     String personalBest = "";
+    String discordWebhookUrl = "";
+    boolean shouldUploadToDiscord = false;
 
+    @Inject
+    private InfernoSplitsLoggerConfig config;
 
     @Subscribe
     private void onChatMessage(ChatMessage event){
@@ -41,6 +49,22 @@ public class InfernoSplitsLoggerPlugin extends Plugin{
         HandleKcMessage(event);
         HandleDurationMessage(event);
         HandleDefeatedMessage(event);
+    }
+
+    @Provides
+    InfernoSplitsLoggerConfig provideConfig(ConfigManager configManager)
+    {
+        return configManager.getConfig(InfernoSplitsLoggerConfig.class);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged configChanged)
+    {
+        if (configChanged.getGroup().equalsIgnoreCase(InfernoSplitsLoggerConfig.GROUP))
+        {
+            discordWebhookUrl = config.getDiscordWebhookUrl();
+            shouldUploadToDiscord = config.getShouldUploadToDiscord();
+        }
     }
 
     private void HandleFirstWaveMessage(ChatMessage event) {
