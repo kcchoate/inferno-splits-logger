@@ -34,10 +34,9 @@ public class FileLoggerMessageProcessor extends BaseMessageProcessor {
         dir.mkdirs();
 
         String fileName = getFileName();
-
         try (FileWriter fw = new FileWriter(new File(dir, fileName)))
         {
-            fw.write(waveSplitsString);
+            fw.write(getSplitsCsv());
         }
         catch (IOException ex)
         {

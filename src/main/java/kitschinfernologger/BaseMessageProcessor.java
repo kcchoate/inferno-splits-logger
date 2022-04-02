@@ -5,9 +5,7 @@ import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,10 +19,9 @@ public abstract class BaseMessageProcessor {
 
     private final Pattern wavePattern = Pattern.compile("(?<=wave: )\\d+", Pattern.CASE_INSENSITIVE);
     private final Pattern killCountPattern = Pattern.compile("(?<=your tzkal-zuk kill count is: )\\d+", Pattern.CASE_INSENSITIVE);
+    private final Pattern waveSplitPattern = Pattern.compile("(?<=wave split: )\\d+:\\d+", Pattern.CASE_INSENSITIVE);
 
-    private final List<String> removeFromStringStrings = Arrays.asList("<col=ef1020>","</col>","<col=ff0000>");
-    String waveSplitsString = "";
-
+    Map<Integer, String> waveSplits = new HashMap<>();
     int currentWave;
     int killCount;
     String duration = "";
@@ -60,7 +57,7 @@ public abstract class BaseMessageProcessor {
     }
 
     public void reset() {
-        waveSplitsString = "";
+        waveSplits.clear();
         personalBest = "";
         duration = "";
         currentWave= 0;
@@ -79,12 +76,11 @@ public abstract class BaseMessageProcessor {
     }
 
     void HandleWaveSplitMessage(ChatMessage message) {
-        String chatMessage = message.getMessage();
-        for (String removestring : removeFromStringStrings)
-        {
-            chatMessage = chatMessage.replace(removestring,"");
+        final String text = message.getMessage();
+        Matcher matcher = waveSplitPattern.matcher(text);
+        if (matcher.find()) {
+            waveSplits.put(currentWave, text);
         }
-        waveSplitsString += currentWave + ", " + chatMessage +"\n";
     }
 
     void HandleKcMessage(ChatMessage message) {
@@ -100,9 +96,6 @@ public abstract class BaseMessageProcessor {
         }
         duration = message.getMessage().split("</")[0].split(">")[1].replace(":",";").replace(".",",");
         personalBest = message.getMessage().split("Personal best: ")[1];
-
-        waveSplitsString += "Duration: " + duration + "\n";
-        waveSplitsString += "Personal best: " + personalBest;
     }
 
     void HandleDefeatedMessage(ChatMessage message) {
@@ -111,6 +104,19 @@ public abstract class BaseMessageProcessor {
 
     void HandleUnknownMessage(ChatMessage message) {
 
+    }
+
+    String getSplitsCsv() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Wave,Split");
+
+        for (Map.Entry<Integer, String> split : waveSplits.entrySet()) {
+            sb.append('\n');
+            sb.append(split.getKey());
+            sb.append(split.getValue());
+        }
+
+        return sb.toString();
     }
 
     private MessageType getMessageType(ChatMessage message) {
